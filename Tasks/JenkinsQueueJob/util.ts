@@ -190,6 +190,7 @@ function submitJob(taskOptions: TaskOptions): Q.Promise<string> {
             }
         } else if (httpResponse.statusCode == 404) { // team-build plugin endpoint failed because it is not installed
             console.log('Install the "Team Foundation Server Plug-in" for improved Jenkins integration\n' + taskOptions.teamPluginUrl);
+            taskOptions.teamBuildPluginAvailable = false;
 
             tl.debug('httpResponse: ' + JSON.stringify(httpResponse));
             let jobQueuePostData = addCrumb(taskOptions.parameterizedJob ?
@@ -224,6 +225,7 @@ function submitJob(taskOptions: TaskOptions): Q.Promise<string> {
         } else if (httpResponse.statusCode != 201) {
             defer.reject(getFullErrorMessage(httpResponse, 'Job creation failed.'));
         } else {
+            taskOptions.teamBuildPluginAvailable = true;
             let jsonBody = JSON.parse(body)
             let queueUri = addUrlSegment(jsonBody.created, 'api/json');
             defer.resolve(queueUri);
